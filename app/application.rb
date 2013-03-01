@@ -9,6 +9,8 @@ class Trilby < Sinatra::Base
 
     get "/example/one", ExampleController, :example_one
     get "/example/two", ExampleTwoController, :example_two
+    get "/example/three/:id", ExampleTwoController, :example_three
+    get "/example/four", ExampleTwoController, :example_four, :formats=>[:json, :html]
 
     #
     # context "/accounts/:account_id" do 

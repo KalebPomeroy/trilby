@@ -5,6 +5,8 @@ This allows a user to write sinatra routes with a smart DSL like so
     # get route, class, method_name
     get "/example/one", ExampleController, :example_one
 ```
+Routes should not contain trailing slashes; they are added optionally by default. 
+
 
 It also allows a controller to have access to methods that the rest of the application does not. Typically
 with Sinatra, if you need to call a method, you have to add it to the helper class, which become dirty very quickly. 
@@ -26,9 +28,6 @@ with Sinatra, if you need to call a method, you have to add it to the helper cla
 
 ### TODO
 
-* Format in the routes
-* url_for
-* trailing slashes
 * context for routes
 * rake routes
 * before filters (?)

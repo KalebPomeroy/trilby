@@ -15,18 +15,42 @@ class ExampleController < BaseController
     end
 
     def example_one
-        "It came from " + controller_specific_logic
+        next_url = sinatra.url_for ExampleTwoController, :example_two
+        "It came from " + controller_specific_logic + 
+            "<br /><a href='#{next_url}'>#{next_url}</a>" 
     end
 end
 
 class ExampleTwoController < BaseController
-    def controller_specific_logic()
-        puts sinatra.request # prove I can access sinatra request object
-        return "Return stuff specific to example two"
-    end
 
     def example_two
-        controller_specific_logic
+        next_url = sinatra.url_for ExampleTwoController, :example_three, :id=>3
+
+        "This is example two" +
+            "<br /><a href='#{next_url}'>#{next_url}</a>" 
+    end
+
+    def example_three
+        next_url = {
+            :json => sinatra.url_for(ExampleTwoController, :example_four, :format=>:json),
+            :html =>sinatra.url_for(ExampleTwoController, :example_four, :format=>:html),
+            :default =>sinatra.url_for(ExampleTwoController, :example_four)
+        }
+
+        sinatra.params[:id] + " is the ID" +
+            "<br /><a href='#{next_url[:json]}'>#{next_url[:json]}</a>" +
+            "<br /><a href='#{next_url[:html]}'>#{next_url[:html]}</a>" +
+            "<br /><a href='#{next_url[:default]}'>#{next_url[:default]}</a>" 
+
+    end
+
+    def example_four
+
+        data = {'data'=>'this is your datas'}
+        return data.to_json if sinatra.format=="json"
+        
+        "HTML says hi"
+        
     end
 
 end

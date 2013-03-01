@@ -23,3 +23,14 @@ with Sinatra, if you need to call a method, you have to add it to the helper cla
         "It came from " + controller_specific_logic
     end
 ```
+
+### TODO
+
+* Format in the routes
+* url_for
+* trailing slashes
+* context for routes
+* rake routes
+* before filters (?)
+* check if method exists
+* make it a gem

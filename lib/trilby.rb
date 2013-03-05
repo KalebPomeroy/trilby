@@ -1,3 +1,7 @@
+require 'rubygems'
+require 'sinatra/base'
+require 'trilby/controller'
+
 class Trilby < Sinatra::Base
     
     class << self
@@ -5,10 +9,15 @@ class Trilby < Sinatra::Base
         alias :super_put :put
         alias :super_post :post
         alias :super_delete :delete
+        alias :super_before :before
     end
+
 
     @@routes = {}
 
+    def self.list_routes
+        @@routes
+    end
     #
     # Given a controller and methods (and optionally arguments) this generates
     # a the route to get there. If there are named params, its tries to fill them
@@ -19,14 +28,10 @@ class Trilby < Sinatra::Base
     # comment, simply pass :post_id in the args parameter. 
     #
     def url_for controller, method_name, args={}  
-        path = @@routes["#{controller}.#{method_name}"]
-        
-        puts path
-        puts "#{controller}.#{method_name}"
-        if args[:format]
-            puts args[:format]
-            path += ".#{args[:format]}"
-        end
+        route = "#{controller}.#{method_name}"
+        route += ".#{args[:format]}" if args[:format]
+
+        path = @@routes[route]
 
         raise "Could not find route for #{controller}.#{method_name}" unless path
         path.gsub!(/:([a-z_])*/) { |p| args[p[1..-1].to_sym] || p }
@@ -42,6 +47,7 @@ class Trilby < Sinatra::Base
 
     def self.modify_path http_method, path, controller, method_name, args
         
+        return unless path
 
         # Add the pretty route to the @@routes hash
         if path.is_a? String
@@ -51,6 +57,7 @@ class Trilby < Sinatra::Base
 
         if args[:formats]
             args[:formats].each do |format| 
+                @@routes["#{controller}.#{method_name}.#{format}"] = "#{path}.#{format}"
                 self.send(http_method, %r{#{path}.(#{format})}, controller, method_name, {})
             end
         end
@@ -58,22 +65,40 @@ class Trilby < Sinatra::Base
         path
     end
 
-
     def self.get path, controller, method_name, args={}
-        puts "Adding #{path} to #{controller}.#{method_name}"
-        path = Trilby.modify_path :get, path, controller, method_name, args
-        instance_eval("super_get(path) { controller.new(self).#{method_name} }")
+        path = modify_path :get, path, controller, method_name, args
+        instance_eval("super_get(path) do 
+            c = controller.new(self)
+            c.before_filter unless args[:skip_filter]
+            c.#{method_name} 
+        end")
     end
     def self.put path, controller, method_name, args={}
         path = modify_path :put, path, controller, method_name, args
-        instance_eval("super_put(path) { controller.new(self).#{method_name} }")
+        instance_eval("super_put(path) do 
+            c = controller.new(self)
+            c.before_filter unless args[:skip_filter]
+            c.#{method_name} 
+        end")
     end
     def self.post path, controller, method_name, args={}
         path = modify_path :post, path, controller, method_name, args
-        instance_eval("super_post(path) { controller.new(self).#{method_name} }")
+        instance_eval("super_post(path)do 
+            c = controller.new(self)
+            c.before_filter unless args[:skip_filter]
+            c.#{method_name} 
+        end")
     end
     def self.delete path, controller, method_name, args={}
         path = modify_path :delete, path, controller, method_name, args
-        instance_eval("super_delete(path) { controller.new(self).#{method_name} }")
+        instance_eval("super_delete(path) do 
+            c = controller.new(self)
+            c.before_filter unless args[:skip_filter]
+            c.#{method_name} 
+        end")
+    end
+    def self.before path, controller, method_name, args={}
+        path = modify_path :before, path, controller, method_name, args
+        instance_eval("super_before(path) {controller.new(self).#{method_name} }")
     end
 end 

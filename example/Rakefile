@@ -1,3 +1,17 @@
+desc "List all routes"
+task :routes do
+
+    require 'app/application'
+
+    routes = Trilby.list_routes
+
+    # TODO: Order these
+    longest_key = routes.keys.max { |a, b| a.length <=> b.length }
+    routes.each do |method, route|
+        printf "%#{longest_key.length}s %s\n", method, route 
+    end
+end
+
 
 desc "Run unicorn and tail output"
 namespace :server do

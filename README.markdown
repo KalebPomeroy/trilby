@@ -28,8 +28,7 @@ with Sinatra, if you need to call a method, you have to add it to the helper cla
 
 ### TODO
 
-* context for routes
-* rake routes
 * before filters (?)
 * check if method exists
-* make it a gem
+* rake routes
+* context for routes

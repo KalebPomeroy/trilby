@@ -1,5 +1,4 @@
 require "rubygems"
-require "sinatra/base"
 require "json"
 require "trilby"
 
@@ -22,9 +21,21 @@ class Trilby < Sinatra::Base
     #   get "/servers/:server_id", ServersController, :show
     #
     #   context "/servers/:server_id" do 
-    #       before_filter ServersController, :server_details
+    #       post "", :update
     #       get "/images", ImagesController, :list
-        # end
+    #   end
+    #   filtered "SomeClass#some_method" do 
+    #    ... here be routes ...
+    #   end
+    #
+    #   filtered "Some Name that is friendly", ["Class#method", "Class2#method"], :methods => [:get] do 
+    #    ... here be routes ...
+    #       get "dad"
+    #       put "things"
+    #       filtered "OtherClass#other_method" do 
+    #           get "/your_mom" ...
+    #       end
+    #   end
     #    
     # end
 

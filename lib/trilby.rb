@@ -31,7 +31,7 @@ class Trilby < Sinatra::Base
         route = "#{controller}.#{method_name}"
         route += ".#{args[:format]}" if args[:format]
 
-        path = @@routes[route]
+        path = @@routes[route].clone
 
         raise "Could not find route for #{controller}.#{method_name}" unless path
         path.gsub!(/:([a-z_])*/) { |p| args[p[1..-1].to_sym] || p }
